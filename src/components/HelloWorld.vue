@@ -20,7 +20,7 @@
         <span v-if="value.daychange>0" class="tag is-success">{{value.daychange}}</span>
         <span v-if="value.daychange<=0" class="tag is-danger">{{value.daychange}}</span>
 
-        <stockChart :chart-data="value" height="200px"></stockChart>
+        <stockChart :chart-data="value" :height="200"></stockChart>
 
         <h2>{{value.amount}}</h2>
 
@@ -36,6 +36,7 @@
 <script>
 import * as api from "../api";
 import StockChart from "./StockChart.vue"
+import { Toast } from 'buefy/dist/components/toast'
 
 export default {
   name: "HelloWorld",
@@ -53,20 +54,6 @@ export default {
     },
   }),
   methods: {
-    async buy() {
-      if (this.companyId) {
-        try {
-          const id = await api.placeImmediateBuyOrder(this.companyId, 1);
-          alert("We bought a new share with id: " + id);
-        } catch (e) {
-          alert(e.message);
-        }
-      } else {
-        alert(
-          "Please wait for the first server response. (Did you fill in your credentials?)"
-        );
-      }
-    },
     handleGameUpdate(game) {
       this.time+=1;
       // if(this.time%10!=0){
@@ -110,19 +97,37 @@ export default {
 
     async buy(stock,value) {
         try {
-          const id = await api.placeImmediateBuyOrder(stock, value);
-          alert("We bought a new share with id: " + stock);
+          for(var i=0; i<value; i+=100)
+          {
+            if(i==0){
+              await api.placeImmediateBuyOrder(stock, 100);
+            }else{
+              setTimeout(async function(){
+                await api.placeImmediateBuyOrder(stock, 100);
+              }, 400);
+            }
+          }
+          Toast.open("We bought " + value+ " new share with id: " + stock);
         } catch (e) {
-          alert(e.message);
+          Toast.open(e.message);
         }
     },
 
     async short(stock,value) {
-        try {
-          const id = await api.placeImmediateSellOrder(stock, value);
-          alert("We short a new share with id: " + stock);
+      try{
+          for(var i=0; i<value; i+=100)
+          {
+            if(i==0){
+              await api.placeImmediateBuyOrder(stock, 100);
+            }else{
+              setTimeout(async function(){
+                await api.placeImmediateBuyOrder(stock, 100);
+              }, 400);
+            }
+          }
+          Toast.open("We short " + value+ " new share with id: " + stock);
         } catch (e) {
-          alert(e.message);
+          Toast.open(e.message);
         }
     },
   },
