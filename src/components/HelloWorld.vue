@@ -1,12 +1,15 @@
 <template>
   <div>
-    Hello
-    <StockChart :data="datasets"></StockChart>
-    <h1>Have fun @ Coding MADness!</h1>
-    <p>Welcome: {{ name }}!</p>
-    <button @click="buy()">Buy 1 share of ING</button>
-    <h2>Latest news:</h2>
-    <p>{{news}}</p>
+    <div class="box">
+      <h2>Latest news:</h2>
+      <p>{{news}}</p>
+    </div>
+    <div class="columns is-multiline">
+      <div v-for="(value,key) in data" class="box column is-one-quarter">
+        {{key}}
+        <stockChart :chart-data="value"></stockChart>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -24,15 +27,8 @@ export default {
     companyId: null,
     time: 0,
     news: "No latest news yet!",
-    datasets:{
-          datasets: [
-            {
-              data: [1, 2]
-            }, {
-              data: [1, 2]
-            }
-          ]
-        }
+    data:{
+    },
   }),
   methods: {
     async buy() {
@@ -50,17 +46,29 @@ export default {
       }
     },
     handleGameUpdate(game) {
-      this.datasets.datasets.append({'data':[this.time,game[1]].value]})
+      console.log(game.companies)
+      if(!game.companies){
+        return;
+      }
+      for(var i in game.companies){
+        var company = game.companies[i]
+        var key = company.key
+        if(!this.data[key]){
+          this.data[key]={"datasets":[{'data':[]}],"labels":[]};
+        } else {
+          this.data[key]['labels'].push(parseInt(this.time));
+          this.data[key]['datasets'][0]['data'].push(parseInt(company.value));
+        }
+      }
       this.time+=1;
-      console.log(game[1])
       // For now we want to extract the companyId and player name
-      this.name = game.player.name;
-      this.companyId = game.companies.find(c => c.key === "ing").id;
+      // this.name = game.player.name;
+      // this.companyId = game.companies.find(c => c.key === "ing").id;
     }
   },
 
   // This method is called once when the component is started
-  mounted() {
+   mounted() {
     // Subscribe to game updates
     this.querySubscription = api.activeGameSubscription().subscribe({
       next: ({ data }) => {
