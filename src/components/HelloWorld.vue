@@ -2,8 +2,12 @@
   <div>
     <div class="">
       <div class="box column">
-        <h2>Capital:</h2>
+        <h2>Cash:</h2>
         <p>{{capital}}</p>
+      </div>
+      <div class="box column">
+        <h2>Portfolio value:</h2>
+        <p>{{capital+stockvalue}}</p>
       </div>
       <div class="box column">
         <h2>Latest news:</h2>
@@ -11,18 +15,19 @@
       </div>
     </div>
     <div class="columns is-multiline">
-      <div v-for="(value,key) in data" class="box column is-one-quarter">
+      <div v-for="(value,key) in data" class="box column is-1">
         {{key}}
-        <stockChart :chart-data="value"></stockChart>
+        <span v-if="value.daychange>0" class="tag is-success">{{value.daychange}}</span>
+        <span v-if="value.daychange<=0" class="tag is-danger">{{value.daychange}}</span>
+
+        <stockChart :chart-data="value" height="200px"></stockChart>
 
         <h2>{{value.amount}}</h2>
 
-        <input :ref="key + 'buy'">
-        <button @click="buy(value.id,$refs[key+'buy'][0].value)">Buy share</button>
+        <button v-for="amount in [100,300,1000]" @click="buy(value.id,amount)">Buy {{amount}}</button>
         <br>
 
-        <input :ref="key + 'sell'">
-        <button @click="short(value.id,$refs[key+'sell'][0].value)">Sell/Short share</button>
+        <button v-for="amount in [100,300,1000]" @click="short(value.id,amount)">short {{amount}}</button>
       </div>
     </div>
   </div>
@@ -41,6 +46,8 @@ export default {
     name: "[waiting for server]",
     companyId: null,
     time: 0,
+    capital:0,
+    stockvalue:0,
     news: "No latest news yet!",
     data:{
     },
@@ -61,14 +68,18 @@ export default {
       }
     },
     handleGameUpdate(game) {
-      console.log(game)
+      this.time+=1;
+      // if(this.time%10!=0){
+      //   return;
+      // }
       if(!game.companies){
         return;
       }
       var shares = game.player.shares;
+      this.stockvalue=0
       var b = 0;
       for(var i in game.companies){
-        if(b>1000){
+        if(b>100  ){
           break;
         }
         b++;
@@ -76,18 +87,21 @@ export default {
         var key = company.key
         var id = company.id
         if(!this.data[key]){
-          this.data[key]={"id":id,'amount':0,"datasets":[{'data':[]}],"labels":[]};
+          this.data[key]={"id":id,"daychange":0,'amount':0,"datasets":[{'data':[]}],"labels":[]};
         } else {
           this.data[key]['labels'].push(parseInt(this.time));
-          this.data[key]['datasets'][0]['data'].push(parseInt(company.value));
-          console.log(shares)
+          var current = parseInt(company.value)
+          this.data[key]['datasets'][0]['data'].push(current);
+          var first = this.data[key]['datasets'][0]['data'][0]
           var share = shares.find(c => c.company.id === id);
+
+          this.data[key]['daychange']=Math.round((current-first)/first * 100) / 100;
           if(share){
             this.data[key]['amount']=share.amount;
+            this.stockvalue+=share.amount*current
           }
         }
       }
-      this.time+=1;
       this.capital = game.player.capital;
       // For now we want to extract the companyId and player name
       // this.name = game.player.name;
@@ -95,7 +109,6 @@ export default {
     },
 
     async buy(stock,value) {
-      console.log(value);
         try {
           const id = await api.placeImmediateBuyOrder(stock, value);
           alert("We bought a new share with id: " + stock);
@@ -131,7 +144,6 @@ export default {
     this.newsSubscription = api.newsSubscription().subscribe({
       next: ({ data }) => {
         // Show the news
-        console.log(data);
         this.news = data.news.headline;
       },
       error: e => {
