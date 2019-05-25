@@ -94,7 +94,9 @@ export default {
       // this.name = game.player.name;
       // this.companyId = game.companies.find(c => c.key === "ing").id;
     },
-
+    wait(ms){
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     async buy(stock,value) {
         try {
           for(var i=0; i<value; i+=100)
@@ -102,9 +104,8 @@ export default {
             if(i==0){
               await api.placeImmediateBuyOrder(stock, 100);
             }else{
-              setTimeout(async function(){
-                await api.placeImmediateBuyOrder(stock, 100);
-              }, 400);
+              this.wait(500);
+              await api.placeImmediateBuyOrder(stock, 100);
             }
           }
           Toast.open("We bought " + value+ " new share with id: " + stock);
@@ -118,11 +119,10 @@ export default {
           for(var i=0; i<value; i+=100)
           {
             if(i==0){
-              await api.placeImmediateBuyOrder(stock, 100);
+              await api.placeImmediateSellOrder(stock, 100);
             }else{
-              setTimeout(async function(){
-                await api.placeImmediateBuyOrder(stock, 100);
-              }, 400);
+              this.wait(500);
+              await api.placeImmediateSellOrder(stock, 100);
             }
           }
           Toast.open("We short " + value+ " new share with id: " + stock);
