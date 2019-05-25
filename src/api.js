@@ -3,7 +3,7 @@ import Client, { gql } from './apollo-graphql-client'
 
 
 // Fill in your token here
-const TOKEN = null
+const TOKEN = "eyJhbGciOiJIUzI1NiJ9.ZmVsaXhmYXJpYXNmdWV5b0Bob3RtYWlsLmNvbQ.Zi-NWjUp7_wOPuaay3oRQFOsqiKrNC4QJUneFxCwVXo"
 
 if (!TOKEN) alert("No api token set. Insert your personal token in api.js!")
 
