@@ -1,13 +1,28 @@
 <template>
   <div>
-    <div class="box">
-      <h2>Latest news:</h2>
-      <p>{{news}}</p>
+    <div class="">
+      <div class="box column">
+        <h2>Capital:</h2>
+        <p>{{capital}}</p>
+      </div>
+      <div class="box column">
+        <h2>Latest news:</h2>
+        <p>{{news}}</p>
+      </div>
     </div>
     <div class="columns is-multiline">
       <div v-for="(value,key) in data" class="box column is-one-quarter">
         {{key}}
         <stockChart :chart-data="value"></stockChart>
+
+        <h2>{{value.amount}}</h2>
+
+        <input :ref="key + 'buy'">
+        <button @click="buy(value.id,$refs[key+'buy'][0].value)">Buy share</button>
+        <br>
+
+        <input :ref="key + 'sell'">
+        <button @click="short(value.id,$refs[key+'sell'][0].value)">Sell/Short share</button>
       </div>
     </div>
   </div>
@@ -46,25 +61,57 @@ export default {
       }
     },
     handleGameUpdate(game) {
-      console.log(game.companies)
+      console.log(game)
       if(!game.companies){
         return;
       }
+      var shares = game.player.shares;
+      var b = 0;
       for(var i in game.companies){
+        if(b>1000){
+          break;
+        }
+        b++;
         var company = game.companies[i]
         var key = company.key
+        var id = company.id
         if(!this.data[key]){
-          this.data[key]={"datasets":[{'data':[]}],"labels":[]};
+          this.data[key]={"id":id,'amount':0,"datasets":[{'data':[]}],"labels":[]};
         } else {
           this.data[key]['labels'].push(parseInt(this.time));
           this.data[key]['datasets'][0]['data'].push(parseInt(company.value));
+          console.log(shares)
+          var share = shares.find(c => c.company.id === id);
+          if(share){
+            this.data[key]['amount']=share.amount;
+          }
         }
       }
       this.time+=1;
+      this.capital = game.player.capital;
       // For now we want to extract the companyId and player name
       // this.name = game.player.name;
       // this.companyId = game.companies.find(c => c.key === "ing").id;
-    }
+    },
+
+    async buy(stock,value) {
+      console.log(value);
+        try {
+          const id = await api.placeImmediateBuyOrder(stock, value);
+          alert("We bought a new share with id: " + stock);
+        } catch (e) {
+          alert(e.message);
+        }
+    },
+
+    async short(stock,value) {
+        try {
+          const id = await api.placeImmediateSellOrder(stock, value);
+          alert("We short a new share with id: " + stock);
+        } catch (e) {
+          alert(e.message);
+        }
+    },
   },
 
   // This method is called once when the component is started
@@ -99,6 +146,7 @@ export default {
     this.querySubscription.unsubscribe();
     this.newsSubscription.unsubscribe();
   }
+
 };
 </script>
 
