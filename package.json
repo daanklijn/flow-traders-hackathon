@@ -13,11 +13,13 @@
     "apollo-link-context": "^1.0.17",
     "apollo-link-http": "^1.5.14",
     "apollo-link-ws": "^1.0.17",
+    "chart.js": "^2.8.0",
     "core-js": "^2.6.5",
     "graphql": "^14.2.1",
     "graphql-tag": "^2.10.1",
     "subscriptions-transport-ws": "^0.9.16",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-chartjs": "^3.4.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.7.0",

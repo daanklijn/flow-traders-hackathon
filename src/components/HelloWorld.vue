@@ -1,5 +1,7 @@
 <template>
   <div>
+    Hello
+    <StockChart :data="datasets"></StockChart>
     <h1>Have fun @ Coding MADness!</h1>
     <p>Welcome: {{ name }}!</p>
     <button @click="buy()">Buy 1 share of ING</button>
@@ -10,16 +12,28 @@
 
 <script>
 import * as api from "../api";
+import StockChart from "./StockChart.vue"
 
 export default {
   name: "HelloWorld",
-
+  components: {
+    StockChart
+  },
   data: () => ({
     name: "[waiting for server]",
     companyId: null,
-    news: "No latest news yet!"
+    time: 0,
+    news: "No latest news yet!",
+    datasets:{
+          datasets: [
+            {
+              data: [1, 2]
+            }, {
+              data: [1, 2]
+            }
+          ]
+        }
   }),
-
   methods: {
     async buy() {
       if (this.companyId) {
@@ -36,6 +50,9 @@ export default {
       }
     },
     handleGameUpdate(game) {
+      this.datasets.datasets.append({'data':[this.time,game[1]].value]})
+      this.time+=1;
+      console.log(game[1])
       // For now we want to extract the companyId and player name
       this.name = game.player.name;
       this.companyId = game.companies.find(c => c.key === "ing").id;
