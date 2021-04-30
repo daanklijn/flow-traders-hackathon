@@ -1,33 +1,5 @@
-# VueJS example
+# We won the Flow Traders Hackathon 2019
 
-This project is created with Vue CLI (https://cli.vuejs.org/) using the default settings (`vue create vue`)
+In May 2019 me and Felix won the Flow Traders Hackathon in The Netherlands. Our task was to develop a stock trading dashboard. We used this dashboard to trade stocks and earned a higher profit than the other teams that were competing. This eventually lead to us winning the competition. You can read more about it in our blog post : https://www.linkedin.com/pulse/age-anything-good-enough-felix-jose-farias-fueyo/?trackingId=tsdfNKSOQhS9BUgZtyjSHA%3D%3D
 
-## Project setup
-```
-npm install
-```
-
-Edit `api.js` and add your credentials
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+![image](https://user-images.githubusercontent.com/27863547/116689589-9b544580-a9b8-11eb-8262-e23f40aac7bd.png)
